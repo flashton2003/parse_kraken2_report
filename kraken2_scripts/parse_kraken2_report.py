@@ -58,7 +58,6 @@ def read_kraken_report(inhandle, taxa_levels):
     return kraken_report_taxa
 
 def add_parents_to_taxa(kraken_report, taxa_levels):
-
     assert kraken_report[0].name == 'unclassified'
     assert kraken_report[1].name == 'root'
     ## parent dict will keep the "current" taxon for each taxonomic level
@@ -77,7 +76,7 @@ def add_parents_to_taxa(kraken_report, taxa_levels):
         ## A. ursingii (level 12) to Betaproteobacteria (level 7). Therefore, we 
         ## need to clean up everything in the parent dict between those levels
         ## the +1 is becayse python ranges are half open
-        if previous_taxonomic_level > taxon.taxonomic_level:
+        if previous_taxonomic_level >= taxon.taxonomic_level:
             to_del = range(taxon.taxonomic_level, previous_taxonomic_level + 1)
             for each in to_del:
                 if each in parent_dict:
@@ -85,9 +84,11 @@ def add_parents_to_taxa(kraken_report, taxa_levels):
         ## have to do it like this because levels can be skipped
         ## i.e. sometimes go from 8 to 11
         ## if the level higher is in the parent dict, that's the parent
+        # print(vars(taxon))
         try:
             taxon.parent = parent_dict[taxon.taxonomic_level - 1]
         except KeyError:
+            # print('KeyError')
             ## if it isn't (becayse might have been cleaned up by above)
             ## then take the highest level in the parent dict as parent
             taxon.parent = parent_dict[max(parent_dict.keys())]
@@ -97,11 +98,20 @@ def add_parents_to_taxa(kraken_report, taxa_levels):
         ## for the next loop
         previous_taxonomic_level = taxon.taxonomic_level
             
-        # if hasattr(taxon, "parent"):
-        #     print(taxon.name, taxon.parent, sep = '\t')
+        if hasattr(taxon, "parent"):
+            print(taxon.name, taxon.parent, sep = '\t')
     return kraken_report
 
 def make_tree(kraken_report):
+    # root = Node('root', taxon = kraken_report[1])
+    kraken_report[1].node = Node('root', taxon = kraken_report[1])
+    for taxon in kraken_report[2:]:
+        taxon.node = Node(taxon.name, parent = taxon.parent.node)
+        print(vars(taxon))
+
+    print(RenderTree(kraken_report[1].node))
+
+
 
 
 def parse_tree(kraken_tree):
