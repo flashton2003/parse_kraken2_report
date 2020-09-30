@@ -18,17 +18,14 @@ class Taxon():
 #     return total
 
 def read_kraken_report(inhandle):
-    # kraken_report = pd.read_csv(inhandle, sep='\t', header=None)
     kraken_report_taxa = []
     with open(inhandle) as fi:
         for line in fi.readlines():
             split_line = line.strip().split('\t')
+            print(split_line)
             taxon = Taxon(split_line)
-            # print(vars(taxa))
             kraken_report_taxa.append(taxon)
-    
-
-    # return kraken_report
+    return kraken_report_taxa
 
 def convert_report_to_tree(kraken_report):
     '''
@@ -61,7 +58,7 @@ def main(inhandle):
     2. parse the report
     '''
     tax_levels = ['U', 'R', 'D', 'K', 'P', 'C', 'O', 'F', 'G', 'S']
-    kraken_report = read_kraken_report(inhandle)
+    kraken_report_taxa = read_kraken_report(inhandle)
     # parse_report(kraken_report)
 
 inhandle = '/Users/flashton/Dropbox/GordonGroup/ben_kumwenda_genomes/kraken2/results/2020.09.30/18080-1-FR10242277.kraken_report.txt'
