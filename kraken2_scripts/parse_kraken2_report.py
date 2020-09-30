@@ -1,7 +1,5 @@
 import os
 import string
-# import pandas as pd
-from collections import namedtuple
 from anytree import Node, RenderTree
 
 class Taxon():
@@ -60,44 +58,50 @@ def read_kraken_report(inhandle, taxa_levels):
     return kraken_report_taxa
 
 def add_parents_to_taxa(kraken_report, taxa_levels):
-    '''
-    1. go thorugh the report lines
-    2. if the line has more than 0.05% of the reads, consider it for inclusion in the output
-    3. only include it in the output if there isn't an entry below it in the taxonomic level which 
-    '''
+
     assert kraken_report[0].name == 'unclassified'
     assert kraken_report[1].name == 'root'
-    # root = Node('root', percent_reads_assigned = kraken_report[1].percent_reads_assigned)
-    current_level = 1
-    # parent_dict = dict(zip(taxa_levels, [None] * len(taxa_levels)))
+    ## parent dict will keep the "current" taxon for each taxonomic level
     parent_dict = {}
+    ## since unclassified doesn't have a parent ot children, not going to include it
+    parent_dict[0] = kraken_report[0]
+    ## setting root up as has no parent, but want it to be in the parent
+    ## dict for reference by it's child/children
     parent_dict[1] = kraken_report[1]
-    current_taxonomic_levels = []
-    for i, taxon in enumerate(kraken_report[1:]):
-        # print()
-        parent_dict[taxon.taxonomic_level] = taxon
-        # print(vars(taxon))
-        # current_taxonomic_levels.append(taxon.full_rank)
-        if taxon.taxonomic_level > current_level:
-            current_level = taxa_levels.index(taxon.full_rank)
-            # taxon.parent_level = current_taxonomic_levels[len(current_taxonomic_levels) - 2]
-            # parent_level = taxa_levels[taxa_levels.index(taxon.full_rank) - 1]
-            # taxon.parent = parent_dict[parent_level].full_rank
+    ## we need to keep track of when we go "up" the levels i.e. 
+    ## from s. bongori to escherichia, which we do by comparing
+    ## current taxonomic level to previous
+    previous_taxonomic_level = 0
+    for taxon in kraken_report[2:]:
+        ## if previous taxonomic level is higher, that means we have moved from e.g. 
+        ## A. ursingii (level 12) to Betaproteobacteria (level 7). Therefore, we 
+        ## need to clean up everything in the parent dict between those levels
+        ## the +1 is becayse python ranges are half open
+        if previous_taxonomic_level > taxon.taxonomic_level:
+            to_del = range(taxon.taxonomic_level, previous_taxonomic_level + 1)
+            for each in to_del:
+                if each in parent_dict:
+                    del(parent_dict[each])
+        ## have to do it like this because levels can be skipped
+        ## i.e. sometimes go from 8 to 11
+        ## if the level higher is in the parent dict, that's the parent
+        try:
             taxon.parent = parent_dict[taxon.taxonomic_level - 1]
-            print(vars(taxon))
-            # Node(taxon.name, parent = root)
-        elif taxa_levels.index(taxon.full_rank) == current_level:
-            # print('heading back up')
-            pass
+        except KeyError:
+            ## if it isn't (becayse might have been cleaned up by above)
+            ## then take the highest level in the parent dict as parent
+            taxon.parent = parent_dict[max(parent_dict.keys())]
+        ## set the current taxon to it's level in the parent dict
+        parent_dict[taxon.taxonomic_level] = taxon
+        ## as the last thing set the current taxon as the "previous level"
+        ## for the next loop
+        previous_taxonomic_level = taxon.taxonomic_level
+            
+        # if hasattr(taxon, "parent"):
+        #     print(taxon.name, taxon.parent, sep = '\t')
+    return kraken_report
 
-
-
-    '''
-    current_level = 0
-    for line in report:
-        if line.level > current_level:
-            node("Name", parent = current_level)
-    '''
+def make_tree(kraken_report):
 
 
 def parse_tree(kraken_tree):
@@ -110,12 +114,15 @@ def parse_tree(kraken_tree):
 
 def main(inhandle, taxa_levels):
     '''
-    1. read in kraken report
-    2. parse the report
+    0. read in kraken report
+    1. go thorugh the report lines
+    2. if the line has more than 0.05% of the reads, consider it for inclusion in the output
+    3. only include it in the output if there isn't an entry below it in the taxonomic level which 
     '''
     
     kraken_report_taxa = read_kraken_report(inhandle, taxa_levels)
-    add_parents_to_taxa(kraken_report_taxa, taxa_levels)
+    kraken_report = add_parents_to_taxa(kraken_report_taxa, taxa_levels)
+    make_tree(kraken_report)
     # parse_report(kraken_report)
 
 inhandle = '/Users/flashton/Dropbox/GordonGroup/ben_kumwenda_genomes/kraken2/results/2020.09.30/18080-1-FR10242277.kraken_report.txt'
