@@ -1,15 +1,17 @@
 import os
 import string
 # import pandas as pd
+from collections import namedtuple
 from anytree import Node, RenderTree
 
 class Taxon():
-    def __init__(self, split_line):
+    def __init__(self, split_line, taxa_levels):
         self.percent_reads_assigned = float(split_line[0])
         self.number_reads_rooted_here = int(split_line[1])
         self.number_reads_assigned_here = int(split_line[2])
         self.full_rank = split_line[3]
         self.rank = self.full_rank.rstrip(string.digits)
+        self.taxonomic_level = taxa_levels.index(self.full_rank)
         self.ncbi_id = int(split_line[4])
         self.name = split_line[5].strip()
 
@@ -47,13 +49,13 @@ tree.insert_child('c')
 # print(tree)
 
 
-def read_kraken_report(inhandle):
+def read_kraken_report(inhandle, taxa_levels):
     kraken_report_taxa = []
     with open(inhandle) as fi:
         for line in fi.readlines():
             split_line = line.strip().split('\t')
             # print(split_line)
-            taxon = Taxon(split_line)
+            taxon = Taxon(split_line, taxa_levels)
             kraken_report_taxa.append(taxon)
     return kraken_report_taxa
 
@@ -69,18 +71,24 @@ def add_parents_to_taxa(kraken_report, taxa_levels):
     current_level = 1
     # parent_dict = dict(zip(taxa_levels, [None] * len(taxa_levels)))
     parent_dict = {}
-    parent_dict['R'] = kraken_report[1]
+    parent_dict[1] = kraken_report[1]
     current_taxonomic_levels = []
-    for taxon in kraken_report[1:]:
-        print()
-        parent_dict[taxon.full_rank] = taxon
-        print(vars(taxon))
-        current_taxonomic_levels.append(taxon.full_rank)
-        if taxa_levels.index(taxon.full_rank) > current_level:
-            parent_level = taxa_levels[taxa_levels.index(taxon.full_rank) - 1]
-            taxon.parent = parent_dict[parent_level].full_rank
+    for i, taxon in enumerate(kraken_report[1:]):
+        # print()
+        parent_dict[taxon.taxonomic_level] = taxon
+        # print(vars(taxon))
+        # current_taxonomic_levels.append(taxon.full_rank)
+        if taxon.taxonomic_level > current_level:
+            current_level = taxa_levels.index(taxon.full_rank)
+            # taxon.parent_level = current_taxonomic_levels[len(current_taxonomic_levels) - 2]
+            # parent_level = taxa_levels[taxa_levels.index(taxon.full_rank) - 1]
+            # taxon.parent = parent_dict[parent_level].full_rank
+            taxon.parent = parent_dict[taxon.taxonomic_level - 1]
             print(vars(taxon))
             # Node(taxon.name, parent = root)
+        elif taxa_levels.index(taxon.full_rank) == current_level:
+            # print('heading back up')
+            pass
 
 
 
@@ -106,7 +114,7 @@ def main(inhandle, taxa_levels):
     2. parse the report
     '''
     
-    kraken_report_taxa = read_kraken_report(inhandle)
+    kraken_report_taxa = read_kraken_report(inhandle, taxa_levels)
     add_parents_to_taxa(kraken_report_taxa, taxa_levels)
     # parse_report(kraken_report)
 
