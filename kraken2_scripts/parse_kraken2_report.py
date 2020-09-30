@@ -127,6 +127,8 @@ def main(inhandle, taxa_levels):
     # parse_report(kraken_report)
 
 inhandle = '/Users/flashton/Dropbox/GordonGroup/ben_kumwenda_genomes/kraken2/results/2020.09.30/18080-1-FR10242277.kraken_report.txt'
+## probably going to need to replace this with getting the taxa levels from the 
+## actual kraken results file.
 taxa_levels = ['U', 'R', 'R1', 'D', 'D1', 'K', 'P', 'C', 'O', 'F', 'G', 'G1', 'S']
 
 assert os.path.exists(inhandle)
