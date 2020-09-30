@@ -13,6 +13,40 @@ class Taxon():
         self.ncbi_id = int(split_line[4])
         self.name = split_line[5].strip()
 
+class BinaryNode():
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+
+    def insert_left(self, child):
+        if self.left is None:
+            self.left = child
+        else:
+            child.left = self.left
+            self.left = child
+
+class Tree():
+    def __init__(self, val):
+        self.val = val
+        self.children = []
+
+    def insert_child(self, val):
+        self.children.append(Tree(val))
+
+    def __repr__(self):
+        return f'Tree({self.val}): {self.children}'
+        
+tree = Tree('a')
+tree.insert_child('b')
+tree.insert_child('c')
+
+# print(root.val)
+# for child in root.children:
+    # print(child.val)
+# print(tree)
+
+
 def read_kraken_report(inhandle):
     kraken_report_taxa = []
     with open(inhandle) as fi:
@@ -23,7 +57,7 @@ def read_kraken_report(inhandle):
             kraken_report_taxa.append(taxon)
     return kraken_report_taxa
 
-def convert_report_taxa_to_tree(kraken_report, taxa_levels):
+def add_parents_to_taxa(kraken_report, taxa_levels):
     '''
     1. go thorugh the report lines
     2. if the line has more than 0.05% of the reads, consider it for inclusion in the output
@@ -31,11 +65,22 @@ def convert_report_taxa_to_tree(kraken_report, taxa_levels):
     '''
     assert kraken_report[0].name == 'unclassified'
     assert kraken_report[1].name == 'root'
-    root = Node('root', percent_reads_assigned = kraken_report[1].percent_reads_assigned)
+    # root = Node('root', percent_reads_assigned = kraken_report[1].percent_reads_assigned)
     current_level = 1
-    for taxon in kraken_report[3:]:
+    # parent_dict = dict(zip(taxa_levels, [None] * len(taxa_levels)))
+    parent_dict = {}
+    parent_dict['R'] = kraken_report[1]
+    current_taxonomic_levels = []
+    for taxon in kraken_report[1:]:
+        print()
+        parent_dict[taxon.full_rank] = taxon
+        print(vars(taxon))
+        current_taxonomic_levels.append(taxon.full_rank)
         if taxa_levels.index(taxon.full_rank) > current_level:
-            Node(taxon.name, parent = root)
+            parent_level = taxa_levels[taxa_levels.index(taxon.full_rank) - 1]
+            taxon.parent = parent_dict[parent_level].full_rank
+            print(vars(taxon))
+            # Node(taxon.name, parent = root)
 
 
 
@@ -62,7 +107,7 @@ def main(inhandle, taxa_levels):
     '''
     
     kraken_report_taxa = read_kraken_report(inhandle)
-    convert_report_taxa_to_tree(kraken_report_taxa, taxa_levels)
+    add_parents_to_taxa(kraken_report_taxa, taxa_levels)
     # parse_report(kraken_report)
 
 inhandle = '/Users/flashton/Dropbox/GordonGroup/ben_kumwenda_genomes/kraken2/results/2020.09.30/18080-1-FR10242277.kraken_report.txt'
