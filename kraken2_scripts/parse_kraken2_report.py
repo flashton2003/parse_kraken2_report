@@ -23,7 +23,7 @@ class Taxon():
 def read_kraken_report(inhandle, taxa_levels, sample_name):
     assert isinstance(taxa_levels, list)
     if sample_name == None:
-        sample_name = inhandle.split('/')[-1].split('.')[0]
+        sample_name = os.path.basename(inhandle).split('.')[0]
     kraken_report_taxa = []
     with open(inhandle) as fi:
         for line in fi.readlines():
@@ -132,7 +132,7 @@ def get_args():
     required_named.add_argument('-i', dest = 'inhandle', type = str, required = True, help = 'Path to kraken report file')
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
-    optional.add_argument('-n', dest = 'sample_name', type = str, help = 'Sample name to be included in output', default = None)
+    optional.add_argument('-n', dest = 'sample_name', type = str, help = 'Sample name to be included in output. If not give, will take everything before the first period of the file name.', default = None)
     optional.add_argument('-l', dest = 'number_of_levels', type = int, default = 2, help = 'How far up from each tip do you want to check? If not working as expected, you may ned to alter -r as well.')
     optional.add_argument('-p', dest = 'percent_reads_assigned_threshold', type = float, default = 0.05, help = 'Minimum threshold of percent_reads_assigned for reporting')
     optional.add_argument('-r', dest = 'taxonomic_ranks', type = str, default = 'S,G', help = 'Taxonomic ranks which you want to report given in comma-separated, upper-case format, no spaces. Rank codes should reflect Kraken2 output documented here https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format. Don\'t include number indicating sub-ranks. If not working as expected, you may need to alter -l as well.')
