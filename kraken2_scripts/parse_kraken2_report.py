@@ -20,9 +20,10 @@ class Taxon():
         print(self.sample_name, self.percent_reads_assigned, self.number_reads_rooted_here, self.number_reads_assigned_here, self.full_rank, self.ncbi_id, self.name, sep = '\t')
 
 
-def read_kraken_report(inhandle, taxa_levels):
+def read_kraken_report(inhandle, taxa_levels, sample_name):
     assert isinstance(taxa_levels, list)
-    sample_name = inhandle.split('/')[-1].split('.')[0]
+    if sample_name == None:
+        sample_name = inhandle.split('/')[-1].split('.')[0]
     kraken_report_taxa = []
     with open(inhandle) as fi:
         for line in fi.readlines():
@@ -131,6 +132,7 @@ def get_args():
     required_named.add_argument('-i', dest = 'inhandle', type = str, required = True, help = 'Path to kraken report file')
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
+    optional.add_argument('-n', dest = 'sample_name', type = str, help = 'Sample name to be included in output', default = None)
     optional.add_argument('-l', dest = 'number_of_levels', type = int, default = 2, help = 'How far up from each tip do you want to check? If not working as expected, you may ned to alter -r as well.')
     optional.add_argument('-p', dest = 'percent_reads_assigned_threshold', type = float, default = 0.05, help = 'Minimum threshold of percent_reads_assigned for reporting')
     optional.add_argument('-r', dest = 'taxonomic_ranks', type = str, default = 'S,G', help = 'Taxonomic ranks which you want to report given in comma-separated, upper-case format, no spaces. Rank codes should reflect Kraken2 output documented here https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format. Don\'t include number indicating sub-ranks. If not working as expected, you may need to alter -l as well.')
@@ -141,7 +143,6 @@ def get_args():
     return args
 
 def check_args_print_tree(args_print_tree):
-    ## separate function to allow testing
     assert args_print_tree in (True, False)
 
 def check_args_taxonomic_ranks(args_taxonomic_ranks):
@@ -152,6 +153,7 @@ def check_args_inhandle(args_inhandle):
     assert os.path.exists(args_inhandle)
 
 def check_args(args):
+    ## separate functions to allow testing
     check_args_print_tree(args.print_tree)
     check_args_inhandle(args.inhandle)
     check_args_taxonomic_ranks(args.taxonomic_ranks)
@@ -168,12 +170,11 @@ def main(taxa_levels):
     '''
     args = get_args()
     check_args(args)
-    kraken_report = read_kraken_report(args.inhandle, taxa_levels)
+    kraken_report = read_kraken_report(args.inhandle, taxa_levels, args.sample_name)
     kraken_report = add_parents_to_taxa(kraken_report, taxa_levels)
     kraken_tree = make_tree(kraken_report, args.print_tree)
     parse_tree(kraken_tree, args.taxonomic_ranks, args.percent_reads_assigned_threshold, args.number_of_levels)
 
-# 
 ## probably going to need to replace this with getting the taxa levels from the 
 ## actual kraken results file.
 taxa_levels = ['U', 'R', 'R1', 'D', 'D1', 'K', 'P', 'C', 'O', 'F', 'G', 'G1', 'S']
