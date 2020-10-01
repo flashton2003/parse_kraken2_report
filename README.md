@@ -1,7 +1,7 @@
 # parse_kraken2_report
 Taxonomically informed parsing of kraken2 report output.
 
-## Motivation
+## Motivation
 
 I find simple parsing of kraken2 output report can be a bit annoying. If you 
 parse only using the percentage/number of reads assigned, then you end up
@@ -12,6 +12,11 @@ missing something significant at a higher level.
 This script will read in a kraken2 report, establish the taxonomic relationships 
 between the results, and then print out as many or as few taxonomic levels as 
 you like, starting from the "tips". 
+
+## Note
+
+This software is fresh out of the box. Please sanity check results and report
+any bugs. 
 
 ## Arguments
 
