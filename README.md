@@ -15,7 +15,7 @@ you like, starting from the "tips".
 
 ## Note
 
-This software is fresh out of the box. Please sanity check results and report
+2020-10-01 This software is fresh out of the box. Please sanity check results and report
 any bugs. 
 
 ## Arguments
