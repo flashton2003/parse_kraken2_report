@@ -19,9 +19,8 @@ class Taxon():
     def print_info(self):
         print(self.sample_name, self.percent_reads_assigned, self.number_reads_rooted_here, self.number_reads_assigned_here, self.full_rank, self.ncbi_id, self.name, sep = '\t')
 
-
-def read_kraken_report(inhandle, taxa_levels, sample_name):
-    assert isinstance(taxa_levels, list)
+def read_kraken_report(inhandle, all_taxa_levels, sample_name):
+    assert isinstance(all_taxa_levels, list)
     if sample_name == None:
         sample_name = os.path.basename(inhandle).split('.')[0]
     kraken_report_taxa = []
@@ -29,12 +28,12 @@ def read_kraken_report(inhandle, taxa_levels, sample_name):
         for line in fi.readlines():
             split_line = line.strip().split('\t')
             # print(split_line)
-            taxon = Taxon(split_line, taxa_levels, sample_name)
+            taxon = Taxon(split_line, all_taxa_levels, sample_name)
             kraken_report_taxa.append(taxon)
     # print(kraken_report_taxa[-1].percent_reads_assigned)
     return kraken_report_taxa
 
-def add_parents_to_taxa(kraken_report, taxa_levels):
+def add_parents_to_taxa(kraken_report):
     assert kraken_report[0].name == 'unclassified'
     assert kraken_report[1].name == 'root'
     ## parent dict will keep the "current" taxon for each taxonomic level
@@ -145,21 +144,20 @@ def get_args():
 def check_args_print_tree(args_print_tree):
     assert args_print_tree in (True, False)
 
-def check_args_taxonomic_ranks(args_taxonomic_ranks):
-    valid_taxa_levels = ['U', 'R', 'D', 'K', 'P', 'C', 'O', 'F', 'G', 'S']
+def check_args_taxonomic_ranks(args_taxonomic_ranks, valid_taxa_levels):
     assert len(set(args_taxonomic_ranks).intersection(valid_taxa_levels)) == len(args_taxonomic_ranks), f'The argument passed to taxonomic_ranks includes invalid options. Valid options are {valid_taxa_levels}'
 
 def check_args_inhandle(args_inhandle):
     assert os.path.exists(args_inhandle)
 
-def check_args(args):
+def check_args(args, valid_taxa_levels):
     ## separate functions to allow testing
     check_args_print_tree(args.print_tree)
     check_args_inhandle(args.inhandle)
-    check_args_taxonomic_ranks(args.taxonomic_ranks)
+    check_args_taxonomic_ranks(args.taxonomic_ranks, valid_taxa_levels)
     
 
-def main(taxa_levels):
+def main(valid_taxa_levels, all_taxa_levels):
     '''
     0. read in kraken report
     1. go thorugh the report lines
@@ -169,17 +167,18 @@ def main(taxa_levels):
     taxonomic level which 
     '''
     args = get_args()
-    check_args(args)
-    kraken_report = read_kraken_report(args.inhandle, taxa_levels, args.sample_name)
-    kraken_report = add_parents_to_taxa(kraken_report, taxa_levels)
+    check_args(args, valid_taxa_levels)
+    kraken_report = read_kraken_report(args.inhandle, all_taxa_levels, args.sample_name)
+    kraken_report = add_parents_to_taxa(kraken_report)
     kraken_tree = make_tree(kraken_report, args.print_tree)
     parse_tree(kraken_tree, args.taxonomic_ranks, args.percent_reads_assigned_threshold, args.number_of_levels)
 
-## probably going to need to replace this with getting the taxa levels from the 
-## actual kraken results file.
-taxa_levels = ['U', 'R', 'R1', 'D', 'D1', 'K', 'P', 'C', 'O', 'F', 'G', 'G1', 'S']
-
-
+valid_taxa_levels = ['U', 'R', 'D', 'K', 'P', 'C', 'O', 'F', 'G', 'S']
+## all_taxa_levels is based on taxa levels identified in ~1000 salmonella monoisolate
+## samples. if you have other taxa levels in your file, you will need to add them in here
+## would be nice to just sort the ones we have, but the arbitrary letter plus number 
+## combo is giving me a headache
+all_taxa_levels = ['U', 'R', 'R1', 'D', 'D1', 'D2', 'D3', 'K', 'P', 'P1', 'P2', 'C', 'C1', 'C2', 'O', 'O1', 'O2', 'F', 'F1', 'F2', 'G', 'G1', 'S', 'S1']
 
 if __name__ == '__main__':
-    main(taxa_levels)
+    main(valid_taxa_levels, all_taxa_levels)
