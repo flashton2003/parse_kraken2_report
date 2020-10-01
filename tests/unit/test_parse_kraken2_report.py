@@ -1,12 +1,11 @@
 import unittest
+import os
 
-
-from kraken2_scripts.parse_kraken2_report import Taxon, taxa_levels
+from kraken2_scripts.parse_kraken2_report import Taxon, taxa_levels, check_args_print_tree, check_args_taxonomic_ranks, check_args_inhandle, read_kraken_report
 
 
 class TestParseKraken2Report(unittest.TestCase):
-
-
+    
     def test_taxon_class_init(self):
         ## salmonella rank is not actually S1, it's just S, but added the S1 to test the rank/full rank switch
         split_line = ['26.78', '759833', '759833', 'G1', '28901', '                Salmonella']
@@ -23,6 +22,28 @@ class TestParseKraken2Report(unittest.TestCase):
 
     def test_taxa_levels(self):
         self.assertEqual(taxa_levels, ['U', 'R', 'R1', 'D', 'D1', 'K', 'P', 'C', 'O', 'F', 'G', 'G1', 'S'], 'Taxa levels corrupted')
+
+    def test_check_args(self):
+        # args = argparse.ArgumentParser()
+        # parser.add_args(dest = 'print_tree')
+        check_args_print_tree(True)
+        check_args_print_tree(False)
+        with self.assertRaises(AssertionError):
+            check_args_print_tree('False')
+            check_args_print_tree(123)
+
+    def test_check_args_taxonomic_ranks(self):
+        check_args_taxonomic_ranks(['S', 'G'])
+        with self.assertRaises(AssertionError):
+            check_args_taxonomic_ranks(['S', 'G', 'T'])
+
+    def test_check_args_inhandle(self):
+        check_args_inhandle(os.path.abspath(__file__))
+        with self.assertRaises(AssertionError):
+            check_args_inhandle('blah_random_jbfjshbdfjsbfk')
+        
+
+
 
 
 if __name__ == '__main__':
