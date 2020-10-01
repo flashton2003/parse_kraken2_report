@@ -97,27 +97,28 @@ def parse_tree(kraken_tree, ranks_to_include, percent_reads_assigned_threshold, 
     '''
     w = Walker()
     # print(kraken_tree)
-    for node in PreOrderIter(kraken_tree):
+    # for node in PreOrderIter(kraken_tree):
         # print(dir(node))
-        if node.is_leaf:
+        # if node.is_leaf:
             # print(node)
             # print()
-            i = 0
-            ## only want two levels up from each tip
-            # print(number_of_levels)
-            while i <= number_of_levels:
-                ## walk between the leaf node and the root
-                ## output of walk is a tuple of tuples, hence the [0]
-                for node2 in w.walk(node, kraken_tree.root)[0]:
-                    ## only want to print species or genus level
-                    if node2.taxon.rank in ranks_to_include:
-                        ## if more than 0.05 reads assigned
-                        if node2.taxon.percent_reads_assigned >= percent_reads_assigned_threshold:
-                            ## prints double for genus as multiple tips lead to same genus
-                            if node2.taxon.printed_already == False:
-                                node2.taxon.print_info()
-                                node2.taxon.printed_already = True
-                            i += 1
+    # i = 0
+    for node in kraken_tree.leaves:
+        ## only want two levels up from each tip
+        # print(number_of_levels)
+        ## walk between the leaf node and the root
+        ## output of walk is a tuple of tuples, hence the [0]
+        for i, node2 in enumerate(w.walk(node, kraken_tree.root)[0]):
+            if i <= number_of_levels - 1:
+                ## only want to print species or genus level
+                if node2.taxon.rank in ranks_to_include:
+                    ## if more than 0.05 reads assigned
+                    if node2.taxon.percent_reads_assigned >= percent_reads_assigned_threshold:
+                        ## prints double for genus as multiple tips lead to same genus
+                        if node2.taxon.printed_already == False:
+                            node2.taxon.print_info()
+                            node2.taxon.printed_already = True
+        
 
 def get_args():
     description = '''
