@@ -104,6 +104,7 @@ def parse_tree(kraken_tree, ranks_to_include, percent_reads_assigned_threshold, 
             # print()
             i = 0
             ## only want two levels up from each tip
+            # print(number_of_levels)
             while i <= number_of_levels:
                 ## walk between the leaf node and the root
                 ## output of walk is a tuple of tuples, hence the [0]
@@ -116,7 +117,7 @@ def parse_tree(kraken_tree, ranks_to_include, percent_reads_assigned_threshold, 
                             if node2.taxon.printed_already == False:
                                 node2.taxon.print_info()
                                 node2.taxon.printed_already = True
-                    i += 1
+                            i += 1
 
 def get_args():
     description = '''
@@ -155,7 +156,6 @@ def check_args(args, valid_taxa_levels):
     check_args_print_tree(args.print_tree)
     check_args_inhandle(args.inhandle)
     check_args_taxonomic_ranks(args.taxonomic_ranks, valid_taxa_levels)
-    
 
 def main(valid_taxa_levels, all_taxa_levels):
     '''
