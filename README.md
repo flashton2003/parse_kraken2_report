@@ -45,7 +45,7 @@ optional arguments:
 
 Defaults:
 
-`python kraken2_scripts/parse_kraken2_report.py -i example.kraken_report.txt -n `
+`python kraken2_scripts/parse_kraken2_report.py -i example.kraken_report.txt -n sample1`
 
 Report species, genus and family (note the -l is set to 3 as well).
 
