@@ -56,6 +56,11 @@ Report species, genus and family (note the -l is set to 3 as well).
 
 `python kraken2_scripts/parse_kraken2_report.py -i example.kraken_report.txt -l 3 -r S,G,F`
 
+This is quite a good option (considering switching the default), print all the "tips" which meet the
+percentage of reads mapped criteria.
+
+`parse_kraken2_report.py -l 1 -r S,G,F,O,C,P,K,D -i example.kraken_report.txt`
+
 ## Dependencies
 
 Uses the python package `anytree` which can be installed from pip. Developed using anytree v2.8.0.
