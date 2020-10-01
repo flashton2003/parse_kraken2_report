@@ -1,0 +1,51 @@
+ 24.27	688643	688643	U	0	unclassified
+ 75.73	2148200	0	R	1	root
+ 75.73	2148200	5994	R1	131567	  cellular organisms
+ 75.51	2142206	63112	D	2	    Bacteria
+ 73.29	2079091	64749	P	1224	      Proteobacteria
+ 71.00	2014194	110228	C	1236	        Gammaproteobacteria
+ 67.11	1903945	273734	O	91347	          Enterobacterales
+ 57.47	1630211	590923	F	543	            Enterobacteriaceae
+ 36.38	1032021	271535	G	590	              Salmonella
+ 26.78	759833	759833	S	28901	                Salmonella enterica
+  0.02	653	653	S	54736	                Salmonella bongori
+  0.26	7253	332	G	561	              Escherichia
+  0.24	6907	6907	S	1169321	                Escherichia sp. KTE114
+  0.00	12	12	S	754331	                Escherichia sp. TW09308
+  0.00	2	2	S	564	                Escherichia fergusonii
+  0.00	13	13	G	570	              Klebsiella
+  0.00	1	0	G	544	              Citrobacter
+  0.00	1	1	G1	1344959	                Citrobacter freundii complex
+  0.00	21	0	O	72274	          Pseudomonadales
+  0.00	11	0	F	135621	            Pseudomonadaceae
+  0.00	11	6	G	286	              Pseudomonas
+  0.00	5	0	G1	136841	                Pseudomonas aeruginosa group
+  0.00	5	5	S	287	                  Pseudomonas aeruginosa
+  0.00	10	0	F	468	            Moraxellaceae
+  0.00	10	4	G	469	              Acinetobacter
+  0.00	6	6	S	108980	                Acinetobacter ursingii
+  0.00	131	0	C	28216	        Betaproteobacteria
+  0.00	131	0	O	80840	          Burkholderiales
+  0.00	126	0	F	80864	            Comamonadaceae
+  0.00	126	0	G	283	              Comamonas
+  0.00	126	126	S	225992	                Comamonas kerstersii
+  0.00	4	1	F	119060	            Burkholderiaceae
+  0.00	3	1	G	48736	              Ralstonia
+  0.00	2	2	S	329	                Ralstonia pickettii
+  0.00	1	1	F	75682	            Oxalobacteraceae
+  0.00	17	3	C	28211	        Alphaproteobacteria
+  0.00	12	0	O	356	          Rhizobiales
+  0.00	11	0	F	41294	            Bradyrhizobiaceae
+  0.00	11	8	G	374	              Bradyrhizobium
+  0.00	3	3	S	1230476	                Bradyrhizobium sp. DFCI-1
+  0.00	1	1	F	118882	            Brucellaceae
+  0.00	2	0	O	204457	          Sphingomonadales
+  0.00	2	1	F	41297	            Sphingomonadaceae
+  0.00	1	0	G	165696	              Novosphingobium
+  0.00	1	1	S	428991	                Novosphingobium panipatense
+  0.00	3	0	D1	1783272	      Terrabacteria group
+  0.00	3	0	P	1239	        Firmicutes
+  0.00	3	0	C	91061	          Bacilli
+  0.00	3	1	O	1385	            Bacillales
+  0.00	2	0	F	186817	              Bacillaceae
+  0.00	2	2	G	1386	                Bacillus
